@@ -1,0 +1,19 @@
+class Solution:
+    def isPowerOfTwo(self, n: int) -> bool:
+        # 利用n & (n-1) == 0
+        if n and n & (n-1) == 0:
+            return True
+        return False
+    
+class Solution:
+    # 递归
+    def isPowerOfTwo(self, n: int) -> bool:
+        if n == 0:
+            return False
+        elif n == 1:
+            return True
+        elif n % 2 != 0:
+            return False
+        else:
+            return self.isPowerOfTwo(n//2)
+        

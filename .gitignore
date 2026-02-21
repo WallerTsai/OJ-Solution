@@ -1,0 +1,4 @@
+leetcode-py/**/*.cpp
+
+leetcode-py/*
+!leetcode-py/*/

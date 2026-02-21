@@ -1,0 +1,25 @@
+from typing import List
+
+
+class Solution:
+    # 灵神
+    def alternatingSubarray(self, nums: List[int]) -> int:
+        ans = -1
+        i, n = 0, len(nums)
+        while i < n - 1:
+            if nums[i + 1] - nums[i] != 1:
+                i += 1  # 直接跳过
+                continue
+            i0 = i  # 记录这一组的开始位置
+            i += 2  # i 和 i+1 已经满足要求，从 i+2 开始判断
+            while i < n and nums[i] == nums[i - 2]:
+                i += 1
+            # 从 i0 到 i-1 是满足题目要求的（并且无法再延长的）子数组
+            ans = max(ans, i - i0)
+            i -= 1
+        return ans 
+
+
+
+
+
