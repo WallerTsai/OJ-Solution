@@ -2,3 +2,6 @@ leetcode-py/**/*.cpp
 
 leetcode-py/*
 !leetcode-py/*/
+
+template
+space
