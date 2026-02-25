@@ -3,5 +3,6 @@ leetcode-py/**/*.cpp
 leetcode-py/*
 !leetcode-py/*/
 
+.vscode
 template
 space
