@@ -1,6 +1,6 @@
 from collections import deque
 from functools import cache
-from typing import List
+from typing import List, Tuple
 
 
 class Solution:
@@ -133,7 +133,7 @@ class Solution:
                 if PO_dfs(i, j) and AO_dfs(i, j):
                     ans.append([i, j])
 
-        return ans  # 这个多次重复
+        return ans  # 超时，这个多次重复
     
 
 class Solution:
@@ -236,3 +236,31 @@ class Solution:
                         ans.append([nx, ny])
 
         return ans  # 23ms
+    
+
+
+# 2026年3月4日
+class Solution:
+    def pacificAtlantic(self, heights: List[List[int]]) -> List[List[int]]:
+        DIR = (1, 0), (0, 1), (-1, 0), (0, -1)
+        m, n = len(heights), len(heights[0])
+
+        def func(cells: List[Tuple[int, int]]):
+            visited = set()
+            def dfs(x: int, y: int):
+                if (x, y) in visited:
+                    return
+                visited.add((x, y))
+                for dx, dy in DIR:
+                    nx = x + dx
+                    ny = y + dy
+                    if 0 <= nx < m and 0 <= ny < n and heights[nx][ny] >= heights[x][y]:
+                        dfs(nx, ny)
+            
+            for i, j in cells:
+                dfs(i, j)
+            return visited
+        
+        PO = [(0, j) for j in range(n)] + [(i, 0) for i in range(m)]
+        AO = [(m - 1, j) for j in range(n)] + [(i, n - 1) for i in range(m)]
+        return list(func(PO) & func(AO))

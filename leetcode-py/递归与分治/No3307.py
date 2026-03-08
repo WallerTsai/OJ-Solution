@@ -48,8 +48,8 @@ class Solution:
         if k <= m:  # k 在左半段
             return self.kthCharacter(k, operations)
         
+        # 右半段
         ans = self.kthCharacter(k - m, operations)
-
         return chr((ord(ans) - ord('a') + op) % 26 + ord('a'))
 
 
@@ -62,3 +62,15 @@ class Solution:
                 inc += operations[i]
                 k -= 1 << i
         return ascii_lowercase[inc % 26]
+    
+
+# 2026年3月3日
+class Solution:
+    def kthCharacter(self, k: int, operations: List[int]) -> str:
+        rev = 0
+        while operations:
+            op = operations.pop()
+            if k > 1 << len(operations):
+                rev += op
+                k -= 1 << len(operations)
+        return ascii_lowercase[rev % 26]
