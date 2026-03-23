@@ -29,3 +29,21 @@ class Solution:
         
         # 使用掩码与 n 进行异或操作
         return n ^ mask
+    
+
+# 2026年3月11日
+class Solution:
+    def bitwiseComplement(self, n: int) -> int:
+        if n == 0:
+            # zero = 0
+            # print(zero.bit_length())
+            # >>> 0
+            return 1
+        
+        m = n.bit_length()
+        return ((1 << m) - 1) ^ n
+    
+
+class Solution:
+    def bitwiseComplement(self, n: int) -> int:
+        return ~n   # 错误

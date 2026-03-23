@@ -1,96 +1,56 @@
-from math import isqrt
+import random
+from bisect import bisect_left, bisect_right
+from collections import defaultdict
+from functools import cache
 from typing import List
 
+# 根据题目给出的条件，区间查询相当于找区间内的众数
+class MajorityChecker:
 
-class Solution:
-    # 分块
-    def numOfUnplacedFruits(self, fruits: List[int], baskets: List[int]) -> int:
-        n = len(baskets)
-        m = isqrt(n)
-        section = (n + m - 1) // m
-        maxV = [0] * section
-
-        for i in range(n):
-            maxV[i // m] = max(maxV[i // m], baskets[i])
-
-        ans = 0
-        for fruit in fruits:
-            choose = 0
-            for sec in range(section):
-                if maxV[sec] < fruit:
-                    continue
-                maxV[sec] = 0
-                for i in range(m):
-                    pos = sec * m + i
-                    if pos < n and baskets[pos] >= fruit and not choose:
-                        baskets[pos] = 0
-                        choose = 1
-                    if pos < n:
-                        maxV[sec] = max(maxV[sec], baskets[pos])
-                break
-            if not choose:
-                ans += 1
-        return ans  # 15701ms
-    
-class SegmentTree:
-    def __init__(self, data):
-        self.n = len(data)
-        # 线段树大小取 2 * 2^{⌈log2 n⌉}
-        size = 1
-        while size < self.n:
-            size <<= 1
-        self.size = size
-        self.tree = [0] * (2 * size)
-        # 建树：把 data 放到叶子区间
-        for i, v in enumerate(data):
-            self.tree[size + i] = v
-        # 自底向上维护每个父节点的 max
-        for i in range(size - 1, 0, -1):
-            self.tree[i] = max(self.tree[2*i], self.tree[2*i+1])
-
-    def update(self, idx, val):
-        # 将位置 pos 叶子节点更新为 value
-        pos = self.size + idx
-        self.tree[pos] = val
-        pos //= 2
-        # 然后向上更新其祖先节点的最大值
-        while pos:
-            self.tree[pos] = max(self.tree[2 * pos], self.tree[2 * pos + 1])
-            pos //= 2
-
-    def find_first(self, val):
-        if self.tree[1] < val:  # 根节点都不够大
-            return -1
-        # 从根节点开始找
-        idx = 1
-        while idx < self.size:  # 还没到叶子
-            # 左子树的最大值
-            if self.tree[2 * idx] >= val:
-                idx = 2 * idx
-            else:
-                idx = 2 * idx + 1
-        # idx 是叶子，映射回原数组下标
-        return idx - self.size
+    def __init__(self, arr: List[int]):
+        self.di = defaultdict(list)
+        for i, x in enumerate(arr):
+            self.di[x].append(i)
 
 
-class Solution:
-    # 作者：wxyz
-    # 链接：https://leetcode.cn/problems/fruits-into-baskets-iii/solutions/3743955/xian-duan-shu-po-su-di-tui-er-fen-he-bin-k6xy/
-    def numOfUnplacedFruits(self, fruits: List[int], baskets: List[int]) -> int:
-        tree = SegmentTree(baskets)
-        ans = 0
-
-        for qty in fruits:
-            i = tree.find_first(qty)
-            if i == -1:  # 没找到
-                ans += 1
-            else:
-                # 用过之后把这个篮子容量置为 -1 表示已使用
-                tree.update(i, -1)
-
-        return ans
+    @cache
+    def query(self, left: int, right: int, threshold: int) -> int:
+        for x, li in self.di.items():
+            if len(li) < threshold:
+                continue
+            if bisect_left(li, right + 1) - bisect_left(li, left) >= threshold:
+                return x
+        return -1
 
 
+
+
+class MajorityChecker:
+    # 随机化 + cache
+    def __init__(self, arr: List[int]):
+        self.arr = arr
+        self.di = defaultdict(list)
+        for i, x in enumerate(arr):
+            self.di[x].append(i)
+        self.items = list(self.di.items())
+
+    @cache
+    def query(self, left: int, right: int, threshold: int) -> int:
+        # 尝试 30 次随机采样，命中众数的概率极高
+        for _ in range(30):
+            idx = random.randint(left, right)
+            x = self.arr[idx]
+            li = self.di[x]
+            if len(li) < threshold:
+                continue
+            
+            if bisect_left(li, right + 1) - bisect_left(li, left) >= threshold:
+                return x
+        return -1
+
+
+
+# 自用线段树模板
 class SegmentTree:
     __slots__ = ('op', 'e', 'n', 'height', 'size', 'tree')
 
@@ -229,20 +189,36 @@ class SegmentTree:
         
         return 0
     
-class Solution:
-    def numOfUnplacedFruits(self, fruits: List[int], baskets: List[int]) -> int:
-        n = len(fruits)
-        op = max
-        e = -1
-        v = baskets
-        st = SegmentTree(op, e, v)
 
-        count = 0
-        for x in fruits:
-            idx = st.max_right(0, lambda y: y < x)
-            if idx < n:
-                count += 1
-                st.set(idx, -1)
+def op(v1, v2):
+    # 摩尔投票
+    c1, cnt1 = v1
+    c2, cnt2 = v2
+    if c1 == c2:
+        return (c1, cnt1 + cnt2)
+    elif cnt1 > cnt2:
+        return (c1, cnt1 - cnt2)
+    else:
+        return (c2, cnt2 - cnt1)
+    
+e = (0, 0)
+
+
+class MajorityChecker:
+
+    def __init__(self, arr: List[int]):
+        self.pos = defaultdict(list)
+        for i, x in enumerate(arr):
+            self.pos[x].append(i)
+
+        v = [(x, 1) for x in arr]
+
+        self.st = SegmentTree(op = op, e = e, v = v)
+
+    def query(self, left: int, right: int, threshold: int) -> int:
+        c, cnt = self.st.query(left, right + 1)
+        li = self.pos[c]
+        cnt = bisect_right(li, right) - bisect_left(li, left)
+
+        return c if cnt >= threshold else -1
         
-        return n - count
-

@@ -1,0 +1,124 @@
+from collections import defaultdict
+
+
+class Solution:
+    def maxActivated(self, points: list[list[int]]) -> int:
+        _set = set()
+        cnt_x = defaultdict(int)
+        cnt_y = defaultdict(int)
+
+        for x, y in points:
+            cnt_x[x] += 1
+            cnt_y[y] += 1
+            _set.add((x, y))
+
+        li_x = sorted(cnt_x.items(), key=lambda a: a[1], reverse=True)
+        li_y = sorted(cnt_y.items(), key=lambda a: a[1], reverse=True)
+        for x, v1 in li_x:
+            for y, v2 in li_y:
+                if (x, y) in _set:
+                    continue
+                return v1 + v2 + 1
+        
+        return max(*li_x, *li_y) + 1
+
+
+# 自用第三版并查集
+class UnionFind:
+    def __init__(self, n: int, base: int = 0):
+        """
+        base = 0: 节点编号 0 ~ n - 1
+        bsee = 1: 节点编号 1 ~ n 
+        """
+        _size = n + 1 if base == 1 else n
+        self.parent = list(range(_size))
+        self.rank = [0] * _size         # 秩, 按秩合并，控制树高
+        self.block_size = [1] * _size   # 每个连通块的节点数量
+        self.block_count = n                  # 连通块数量
+
+    def find(self, x: int) -> int:
+        """ 迭代路径压缩 """
+        root = x
+        while self.parent[root] != root:
+            root = self.parent[root]
+
+        while self.parent[x] != root:
+            temp = self.parent[x]
+            self.parent[x] = root
+            x = temp
+
+        return root
+
+    def union(self, x: int, y: int) -> bool:
+        """ 按秩合并 """
+        root_x, root_y = self.find(x), self.find(y)
+        if root_x == root_y:
+            return False
+        
+        if self.rank[root_x] < self.rank[root_y]:
+            root_x, root_y = root_y, root_x
+
+        self.parent[root_y] = root_x
+        self.block_size[root_x] += self.block_size[root_y]
+        if self.rank[root_x] == self.rank[root_y]:
+            self.rank[root_x] += 1
+        self.block_count -= 1
+
+        return True
+    
+    def merge(self, _from: int, _to: int) -> bool:
+        """ 有向合并 """
+        x, y = self.find(_from), self.find(_to)
+        if x == y:
+            return False
+        
+        self.parent[x] = y
+        self.block_size[y] += self.block_size[x]
+        if self.rank[x] >= self.rank[y]:
+            self.rank[y] = self.rank[x] + 1
+        self.block_count -= 1
+
+        return True
+    
+    def is_connected(self, x: int, y: int) -> bool:
+        return self.find(x) == self.find(y)
+    
+    def get_block_size(self, x: int) -> int:
+        """返回 x 所在连通块的节点数"""
+        return self.block_size[self.find(x)]
+    
+    def get_block_count(self) -> int:
+        """返回当前连通块总数"""
+        return self.block_count
+    
+
+class Solution:
+    def maxActivated(self, points: list[list[int]]) -> int:
+        n = len(points)
+        uf = UnionFind(n)
+        
+        cnt_x = dict()
+        cnt_y = dict()
+
+        for i, (x, y) in enumerate(points):
+            if x in cnt_x:
+                uf.union(i, cnt_x[x])
+            else:
+                cnt_x[x] = i
+
+            if y in cnt_y:
+                uf.union(i, cnt_y[y])
+            else:
+                cnt_y[y] = i
+
+        li = []
+        for i in range(n):
+            if uf.parent[i] == i:
+                li.append(uf.get_block_size(i))
+        li.sort(reverse=True)
+
+        return li[0] + li[1] + 1 if len(li) > 1 else li[0] + 1
+
+
+
+        

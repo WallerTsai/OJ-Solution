@@ -29,3 +29,22 @@ class Solution:
         
         return ans % (10 ** 9 + 7)
 
+
+
+# 日期 2026年3月10日
+# 难理解
+class Solution:
+    def sumSubarrayMins(self, arr: List[int]) -> int:
+        MOD = 10 ** 9 + 7
+        # 左边界哨兵
+        st = [-1]
+        # 右边界哨兵
+        arr.append(-1)
+
+        ans = 0
+        for right, x in enumerate(arr):
+            while len(st) > -1 and arr[st[-1]] > x:
+                i = st.pop()
+                ans = (ans + arr[i] * (i - st[-1]) * (right - i)) % MOD
+            st.append(right)
+        return ans
