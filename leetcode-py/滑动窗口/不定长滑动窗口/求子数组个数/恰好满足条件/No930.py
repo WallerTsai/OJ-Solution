@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, defaultdict
 from typing import List
 
 
@@ -66,3 +66,15 @@ class Solution:
         return res
 
 
+
+# 2026年4月14日
+class Solution:
+    def numSubarraysWithSum(self, nums: List[int], goal: int) -> int:
+        ans = pre_sum = 0
+        cnt = defaultdict(int)
+        cnt[0] = 1
+        for x in nums:
+            pre_sum += x
+            ans += cnt[pre_sum - goal]
+            cnt[pre_sum] += 1
+        return ans

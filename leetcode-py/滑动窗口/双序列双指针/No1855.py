@@ -95,3 +95,14 @@ class Solution:
 # 不难发现 指针2必增加 指针1特定条件才增加
 
 
+class Solution:
+    def maxDistance(self, nums1: List[int], nums2: List[int]) -> int:
+        ans = ptr = 0
+        for i, x in enumerate(nums1):
+            while ptr < len(nums2) and nums2[ptr] >= x:
+                ptr += 1
+            ans = max(ans, ptr - i - 1)
+        return ans
+
+
+

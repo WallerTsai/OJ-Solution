@@ -149,3 +149,37 @@ class Solution:
 
 fun = Solution()
 fun.longestSubarray([1,2,3,1,2])
+
+
+
+# 2026年3月26日
+
+class Solution:
+    def longestSubarray(self, nums: List[int]) -> int:
+        n = len(nums)
+        if n == 1:
+            return 1
+        
+        ans = 2
+
+        suf = [1] * n
+        for i in range(n - 2, -1, -1):
+            if nums[i] <= nums[i + 1]:
+                suf[i] = suf[i + 1] + 1
+
+        pre = 1
+        for i in range(n):
+            if i > 0:
+                ans = max(ans, pre + 1)
+            if i < n - 1:
+                ans = max(ans, suf[i + 1] + 1)
+
+            if i > 0 and i < n - 1 and nums[i - 1] <= nums[i + 1]:
+                ans = max(ans, pre + 1 + suf[i + 1])
+            
+            if  i > 0 and nums[i - 1] <= nums[i]:
+                pre += 1
+            else:
+                pre = 1
+
+        return min(ans, n)

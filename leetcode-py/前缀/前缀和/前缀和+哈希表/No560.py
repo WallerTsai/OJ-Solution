@@ -42,3 +42,20 @@ class Solution:
             ans += cnt[s - k]
             cnt[s] += 1
         return ans
+    
+
+
+# 2026年4月14日
+class Solution:
+    def subarraySum(self, nums: List[int], k: int) -> int:
+        ans = pre_sum = 0
+        cnt = defaultdict(int)
+        cnt[0] = 1
+        for x in nums:
+            pre_sum += x
+            ans += cnt[pre_sum - k]
+            cnt[pre_sum] += 1
+        return ans
+
+
+
