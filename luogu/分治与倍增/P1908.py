@@ -94,3 +94,27 @@ if __name__ == "__main__":
         tree.add(num, 1)
 
     out(str(ans))
+
+
+# 2026年5月6日
+import sys
+sys.setrecursionlimit(200_000)
+
+input = lambda: sys.stdin.readline().rstrip()
+ii = lambda: int(input())
+mii = lambda: map(int, input().split())
+lii = lambda: list(mii())
+
+# data = sys.stdin.read().strip().split()
+# it = iter(data)
+
+out = sys.stdout.write         
+
+
+
+
+
+
+
+
+

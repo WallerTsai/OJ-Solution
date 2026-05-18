@@ -21,3 +21,7 @@ class Solution:
 class Solution:
     def rotate(self, matrix: List[List[int]]) -> None:
         matrix = list(map(list, zip(*matrix[::-1])))    # 错误 开了新的空间
+
+class Solution:
+    def rotate(self, matrix: List[List[int]]) -> None:
+        matrix[:] = list(map(list, zip(*matrix[::-1])))

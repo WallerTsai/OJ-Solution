@@ -1,5 +1,6 @@
 
 from collections import defaultdict
+from itertools import accumulate
 from math import inf
 from typing import List
 
@@ -62,3 +63,64 @@ class Solution:
             suf_min = min(suf_min, nums[i])
             nums[i] = mx
         return nums
+    
+
+
+# 2026年5月7日
+class Solution:
+    def maxValue(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        pre_max = list(accumulate(nums, max))
+        ans = [0] * n
+        suf_min = inf
+        mx = 0
+        for i in range(n - 1, -1, -1):
+            if pre_max[i] <= suf_min:
+                mx = pre_max[i]
+            suf_min = min(suf_min, nums[i])
+            ans[i] = mx
+        return ans
+    
+class Solution:
+    # 灵神
+    # + 动态规划 
+    # ans[i] = 1. preMax[i], preMax[i]≤sufMin[i+1]
+    #          2. ans[i + 1], preMax[i]>sufMin[i+1]
+    def maxValue(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+        pre_max = list(accumulate(nums, max))  # nums 的前缀最大值
+
+        ans = [0] * n
+        suf_min = inf
+        for i in range(n - 1, -1, -1):
+            ans[i] = pre_max[i] if pre_max[i] <= suf_min else ans[i + 1]
+            suf_min = min(suf_min, nums[i])
+        return ans
+
+
+class Solution:
+    # 菲莉斯
+    # 并查集
+    def maxValue(self, nums: List[int]) -> List[int]:
+        n = len(nums)
+
+        parents = list(range(n))
+        def find(x):
+            if x != parents[x]:
+                parents[x] = find(parents[x])
+            return parents[x]
+        mx = nums[:]
+        def merge(x, y):
+            a, b = find(x), find(y)
+            if a != b:
+                parents[a] = b
+                mx[b] = max(mx[b], mx[a])
+
+        pre_max = list(accumulate(nums, max))
+        suf_min = list(accumulate(nums[::-1], min))[::-1]
+        for i in range(n - 1):
+            if pre_max[i] > suf_min[i + 1]:
+                merge(i, i + 1)
+        
+        return [mx[find(i)] for i in range(n)]
+    
